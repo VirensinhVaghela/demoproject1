@@ -1,0 +1,231 @@
+﻿@*@model MvcLoginApp.Models.*@
+@using MvcLoginApp.Common_Classes
+@model MvcLoginApp.Models.RegistrationPageModel
+@{
+    ViewBag.Title = "Home Page";
+
+}
+<style>
+    .lbltitle {
+        background-color: gainsboro;
+        padding: 5px
+    }
+</style>
+
+<div id='divMutualFriendModal' class='modal'>
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Mutual Friends</h4>
+            </div>
+            <div id='divMutualFriendContent'></div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div style="text-align:left;padding:20px;">
+        <h4 class="lbltitle">Suggested Friend</h4>
+    </div>
+    <div>
+        <table class="table table-responsive table-striped">
+            <thead>
+                <tr>
+                    <td>@Html.Hidden("UserID")</td>
+                    <td>@Html.DisplayNameFor(x => x.EmailAddress) </td>
+                    <td>@Html.DisplayNameFor(x => x.UserName)</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.FindFriendList)
+                {
+                    <tr>
+                        <td>@Html.HiddenFor(x => item.UserID)</td>
+                        <td>@Html.DisplayFor(x => item.EmailAddress)</td>
+                        <td>@Html.DisplayFor(x => item.UserName)</td>
+                        <td>
+                            @Html.ActionLink("Send Request", "SendRequest", new { id = item.UserID }, new { @class = "btn btn-primary" })
+                            @*@Html.ActionLink("Mutual Friends", "GetMutualFriendList", new { id = item.UserID }, new { @class = "btn btn-primary divMutualFriend" })*@
+                            @*@Html.ActionLink("Mutual Friends", "GetMutualFriendList", "Home", new { id = item.UserID }, new { @id = "btnAddPage", data_modal = "add", @class = "btn btn-primary active float-right", @role = "button" })*@
+                            @*<button class="btn btn-primary divMutualFriend">Mutual Friends</button>*@
+                            <a href="javascript:void(0);" class="anchorDetail btn btn-primary" data-id="@item.UserID">Mutual Friends</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div id="divMutualFriendList">
+    </div>
+</div>
+
+
+<div>
+    <div style="text-align:left;padding:20px;">
+        <h4 class="lbltitle">Friend Request</h4>
+    </div>
+    <table class="table table-responsive table-striped">
+        <thead>
+            <tr>
+                <td>@Html.Hidden("UserID")</td>
+                <td>@Html.DisplayNameFor(x => x.EmailAddress) </td>
+                <td>@Html.DisplayNameFor(x => x.UserName)</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.RequestedList)
+            {
+                <tr>
+                    <td>@Html.HiddenFor(x => item.UserID)</td>
+                    <td>@Html.DisplayFor(x => item.EmailAddress)</td>
+                    <td>@Html.DisplayFor(x => item.UserName)</td>
+                    <td>
+                        @Html.ActionLink("Accept", "AcceptFriendRequest", new { id = item.UserID }, new { @class = "btn btn-primary" })
+                        @Html.ActionLink("Reject", "RejectFriendRequest", new { id = item.UserID }, new { @class = "btn btn-primary" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <div style="text-align:left;padding:20px;">
+        <h4 class="lbltitle">Friends</h4>
+    </div>
+    <table class="table table-responsive table-striped">
+        <thead>
+            <tr>
+                <td>@Html.Hidden("UserID")</td>
+                <td>@Html.DisplayNameFor(x => x.EmailAddress) </td>
+                <td>@Html.DisplayNameFor(x => x.UserName)</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.FriendList)
+            {
+                <tr>
+                    <td>@Html.HiddenFor(x => item.UserID)</td>
+                    <td>@Html.DisplayFor(x => item.EmailAddress)</td>
+                    <td>@Html.DisplayFor(x => item.UserName)</td>
+                    <td>@Html.ActionLink("Unfriend", "UnFriend", new { id = item.UserID }, new { @class = "btn btn-primary" })</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+@*<script type="text/javascript" src="~/Scripts/GetMutualFriendList.js"></script>*@
+
+@section scripts
+{
+    @*<script src="~/Scripts/jquery-1.10.2.min.js"></script>*@
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script>
+        var TeamDetailPostBackURL = '/Home/GetMutualFriendList';
+        $(function () {
+            $(".anchorDetail").click(function () {
+                debugger;
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: TeamDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "Id": id },
+                    datatype: "json",
+                    success: function (data) {
+                        debugger;
+                        $('#divMutualFriendContent').html(data);
+                        $('#divMutualFriendModal').modal(options);
+                        $('#divMutualFriendModal').modal('show');
+
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+
+            $("#closbtn").click(function () {
+                $('#divMutualFriendModal').modal('hide');
+            });
+        });
+
+    </script>
+
+}
+@*<script type="text/javascript">
+
+        $(function () {
+            $("#divMutualFriendList").dialog({
+                autoOpen: true,
+                position: { my: "center", at: "top+350", of: window },
+                width: 1000,
+                resizable: false,
+                title: 'Mutual Friends',
+                modal: true,
+                open: function () {
+                    debugger
+                    $(this).load('@Url.Action("GetMutualFriendList", "Home")');
+                },
+                buttons: {
+                    Cancel: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+            $(".divMutualFriend").on('click', function () {
+                debugger;
+                $("#divMutualFriendList").dialog('open');
+                return false;
+
+            });
+        });
+
+    </script>*@
+
+
+@*<script type="text/javascript">
+        $(function () {
+            $("#divMutualFriendList").dialog({
+                autoOpen: false,
+                modal: true,
+                title: "View Details"
+            });
+            $(".divMutualFriend").click(function () {
+                debugger
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/GetMutualFriendList",
+                    data: '{UserID:"' + UserID + '" }',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "html",
+                    success: function (response) {
+                        debugger
+                        $('#divMutualFriendList').html(response);
+                        $('#divMutualFriendList').dialog('open');
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+    </script>*@

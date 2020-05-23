@@ -1,0 +1,201 @@
+﻿@using MvcLoginApp.Common_Classes
+@using MvcLoginApp.Models
+@model MvcLoginApp.Models.NewsFeed
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+    //List<SelectListItem> ViewBageNewsFeed = ViewBag.NewsFeed;
+    string UpdateStatusImagePath = "~/images/UpdateStatus.png";
+    string ProfileImagePath = "~/images/ProfilePhoto.png";
+}
+
+@*<script type="text/javascript" src="~/Scripts/jquery-ui.min.js"></script>*@
+@*<link href="~/Content/jquery-ui.css" rel="stylesheet" />*@<link href="~/Scripts/jquery-ui.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/dropzone.min.js"></script>
+<link href="~/Content/dropzone.css" rel="stylesheet" />
+<style>
+    .divtextarea {
+        padding-top: 20px;
+    }
+
+    /*.body-content {
+        background-color: lightgray
+    }*/
+
+    .divnewsfeed {
+        padding-top: 20px;
+    }
+
+    .divStatus {
+        padding-top: 5px;
+        padding-bottom: 5px
+    }
+
+    input, select, textarea {
+        max-width: 100%;
+    }
+    /*Modifiy Original boostrap*/
+    .form-control {
+        padding: 15px 15px;
+    }
+
+    .btn {
+        padding: 6px 36px;
+    }
+
+    input[type=file] {
+        font-size: 100px;
+        position: absolute;
+        left: 0px;
+        top: 15px;
+        opacity: 0;
+        width: 26px !important;
+        height: 26px !important;
+        display: none;
+    }
+
+    [class*=fa-] {
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    [class*=fa-] {
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+    }
+</style>
+<div id="UploadDialog"></div>
+<div class="row" id="NewUpload" style="display:none;">
+    <div class="col-lg-1">
+        <img id="imgUploadProfileImage" src="@Url.Content(ProfileImagePath)">
+    </div>
+    <div class="col-lg-11">
+        <div>
+            <label  class="text-capitalize text-primary text-uppercase" style="font-size:16px;"><b id="lblname"></b></label>
+        </div>
+        <div>
+            <label></label>
+            <img id="uploadedimage" src="">
+        </div>
+    </div>
+</div>
+<div>
+
+    <div class="row">
+        <div class="col-lg-4 divStatus">
+            @*<img src="~/images/icons8-image-file-30.png" />*@
+            <img id="imgUpdateStausImage" src="@Url.Content(UpdateStatusImagePath)" />
+            <label style="font-size: 16px;">Update Status</label>
+        </div>
+    </div>
+    <hr />
+    @using (Html.BeginForm("PostNews", "NewsFeed", FormMethod.Post))
+    {
+        <div class="row divnewsfeed">
+            <div class="col-lg-1">
+                <div>
+                    <img id="imgProfileImage" src="@Url.Content(ProfileImagePath)" />
+                </div>
+                @*<div class="row">
+                        <button class="btn btn-info" data-tooltip='' type="button" onclick="{ $('#divClientUserLayout #inputfileUpload').click(); }" style="margin-bottom: 0 !important;padding: 3px;width: 26px;height: 26px;margin-right:5px;"><i class="fa-upload"></i></button>
+                        <input id="inputfileUpload" type='file' onchange="readURL(this, '#imgHeadShotImage','#btnRemoveHeadShot');" />
+                        <button id="btnRemoveHeadShot" data-tooltip='' type="button" class="btn btn-danger disabled" style="margin-bottom: 0 !important;padding: 3px;width: 26px;height: 26px;margin-right:5px;" onclick="return RemoveHeadShot('#inputfileUpload','#imgHeadShotImage',this)"><i class="fa-trash"></i></button>
+                    </div>*@
+            </div>
+            <div class="col-lg-11">
+                @Html.HiddenFor(x => x.UserID, new { @id = ProjectSession.clientID })
+                @Html.TextAreaFor(x => x.NewsFeeds, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="row" style="padding-top:10px;">
+            <div style="float:right; margin-right: 15px">
+                <a id="lnkUploadPhoto" href="#" data-tooltip="Upload a new photo" class="btn btn-success" onclick="OpenUploadFileDialog()"><span>Upload photo</span></a>
+                <button type="submit" class="btn btn-primary">Post</button>
+            </div>
+        </div>
+    }
+    <hr />
+    @foreach (var item in Model.Data)
+    {
+        <div id="mainDiv" class="row">
+            <div class="col-lg-1">
+                <img id="imgProfileImage" src="@Url.Content(ProfileImagePath)" />
+            </div>
+            <div class="col-lg-11">
+                <div>
+                    <label class="text-capitalize text-primary text-uppercase" style="font-size:16px;"><b>@item.UserName</b></label>
+                </div>
+                <div>
+                    <label>@item.UserPostData</label>
+                    @if(!string.IsNullOrEmpty(item.ImagePath))
+                    {
+                        <img src="@item.ImagePath" />
+                    }
+                </div>
+            </div>
+        </div>
+        <hr />
+    }
+</div>
+
+<script>
+    function OpenUploadFileDialog() {
+      //  AjaxRequestStart();
+        $.ajax({
+            url: '@Url.Action("OpenUploadFileDialog", "NewsFeed")',
+            type: 'POST',
+            dataType: 'html',
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                debugger;
+                if (result != null) {
+
+                    $("#UploadDialog").html(result).dialog({
+                        title: "Upload Photo",
+                        //open: function () {
+                        //    $(this).parent().find(".ui-icon-closethick").html("&times;");
+                        //},
+                        width: '50%',
+                        position: {
+                            my: "center",
+                            at: "middle",
+                            collision: "none"
+                        },
+                        modal: true,
+                        resizable: true,
+                        autoOpen: true,
+                        responsive: true,
+                        close: function () {
+                            $("#UploadDialog").html("");
+                            $(this).dialog('destroy');
+                        },
+                        open: function () {
+                            $(this).parent().find(".ui-icon-closethick").html("&times;");
+                        }
+                    });
+
+                    $(window).resize(function () {
+                        debugger
+                        var $host = $("#UploadDialog").parent();
+                        var hostHeight = $host.height();
+                        var hostWidth = $host.width();
+                         //center dialog on screen
+                        //$("#UploadDialog")[0].left = (hostWidth - this.width) / 2
+                        //$("#UploadDialog")[0].top = (hostHeight - this.height) / 2
+                    });
+                }
+            }
+        });
+    }
+</script>
+
+
+

@@ -1,0 +1,217 @@
+﻿@model MvcLoginApp.Models.RegistrationPageModel
+@{
+    Layout = null;
+}
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+<div>
+    <div class="container-fluid" style="background-color:#3b5998">
+        <div class="row">
+            <div class="col-lg-4 divtitle">
+                <label class="lblheader">TatvaBook</label>
+            </div>
+            <div class="col-lg-3">
+            </div>
+            <div class="divHeader col-lg-5">
+                <table class="tblHeader">
+                    @using (Html.BeginForm("Index", "Login", FormMethod.Post))
+                    {
+                        Html.AntiForgeryToken();
+                        <tr>
+                            @*<td class="tbltd">
+                                @Html.ValidationMessageFor(x => x.EmailAddress, string.Empty, new { @class = "help-inline", @style = "color:red;paddin-top:10px;paddin-bottom:10px;" })
+                            </td>*@
+                            <td class="tbltd">
+                                <div class=" form-group">
+                                    @Html.Label("Email Address", new { @class = "form-label" })
+                                    @Html.TextBoxFor(x => x.EmailAddress, new { @class = "form-control" })
+                                </div>
+                            </td>
+                            <td class="tbltd">
+                                <div class="form-group">
+                                    @Html.Label("Password", new { @class = "form-label" })
+                                    @Html.PasswordFor(x => x.Password, new { @class = "form-control" })
+                                </div>
+                            </td>
+                            <td style="vertical-align: bottom" class="tbltd">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Login</button>
+                                    @*<a href="@Url.Action("RegistrationPage","Login")" class="btn btn-primary">New User</a>*@
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 divimage">
+        <div class="col-lg-12 divinfo">Tatvabook helps you connect and share with the people in your company </div>
+        <div class="col-md-12">
+        <img class="image" src="~/images/tatvabook.jpg" />
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="divaccount">
+            <label class="lblaccount">Create an account</label>
+        </div>
+        <div style="text-align:center;">
+            <label class="lbltext">It's free and always will be.</label>
+        </div>
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-8" style="margin-top:30px;">
+            @using (Html.BeginForm("RegistrationPage", "Login", FormMethod.Post))
+            {
+            <table>
+                <tr>
+                    <td class="tbltd">
+                        <div class="form-group">
+                            @Html.Label("FirstName")
+                            @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.FirstName, "", new { @class = "text-danger" })
+                        </div>
+
+                    </td>
+                    <td class="tbltd">
+                        <div class="form-group">
+                            @Html.Label("LastName")
+                            @Html.TextBoxFor(x => x.LastName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.LastName, "", new { @class = "text-danger" })
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tbltd" colspan="2">
+                        <div class="form-group">
+                            @Html.Label("Username")
+                            @Html.TextBoxFor(x => x.UserName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.UserName, "", new { @class = "text-danger" })
+                        </div>
+                    </td>
+                </tr>
+                @*<tr>
+                    <td class="tbltd" colspan="2">
+                        @Html.ValidationMessageFor(x => x.EmailAddress, string.Empty, new { @class = "help-inline", @style = "color:red;" })
+                    </td>
+                </tr>*@
+                <tr>
+                    <td class="tbltd" colspan="2">
+                        <div class="form-group">
+                            @Html.Label("EmailAddress")
+                            @Html.TextBoxFor(x => x.EmailAddress, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.EmailAddress, "", new { @class = "text-danger" })
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tbltd" colspan="2">
+                        <div class="form-group">
+                            @Html.Label("Password")
+                            @Html.PasswordFor(x => x.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.Password, "", new { @class = "text-danger" })
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="tbltd">
+                        <div class="form-group">
+                            @Html.Label("Type")
+                            @Html.DropDownListFor(x => x.Type, new SelectList(Model.Types, "UserType", "UserType"), new { @class = "form-control" })
+                            @*@Html.DropDownListFor(model => model.Types, new SelectList(Model.Types, "UserID", "UserType", "UserType"), "Select Type", new { @class = "form-control" })*@
+                            @*@Html.DropDownListFor(x => x.Type , @ViewBag.DropDownList as SelectList, "Select Department", new { @class = "form-control"})*@
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tbltd" colspan="2">
+                        <label class="lblterms">
+                            By clicking Sign Up, you agree to our Terms and that you have read our Data Use Policy, including our Cookie Use.
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tbltd" style="padding-top:15px;">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Create an account</button>
+                            @*<a href="@Url.Action("Index","Login")" class="btn btn-primary">Cancel</a>*@
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    /*Modifing original boostrap classes*/
+    input, select, textarea {
+        max-width: 355px !important;
+    }
+    /*end*/
+    .divHeader {
+        background-color: #3b5998;
+        padding: 20px 0px 20px 0px
+    }
+    .divinfo {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .divtitle {
+        text-align: center;
+        margin-top: 35px;
+    }
+
+    .tblHeader {
+        text-align: left;
+    }
+
+    body {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+    .divimage {
+        position: relative;
+    }
+    .bottom-left {
+        position: absolute;
+        bottom: 8px;
+        left: 16px;
+    }
+    .tbltd {
+        padding: 0 10px 0 10px;
+    }
+
+    .lblheader {
+        font-size: 35px;
+        color: white;
+    }
+
+    .image {
+        width: 100%;
+        display: block;
+    }
+
+    .form-label {
+        color: white;
+    }
+
+    .lblaccount {
+        font-size: 35px;
+        margin-top: 10px;
+    }
+
+    .divaccount {
+        text-align: center;
+    }
+
+    .lbltext {
+        font-size: 15px
+    }
+    .lblterms {
+        font-size: 12px;
+    }
+</style>

@@ -1,0 +1,209 @@
+﻿@using MvcLoginApp.Common_Classes
+@{
+    ViewBag.Title = "OpenUploadFileDialog";
+    Layout = null;
+    string ProfileImagePath = "~/images/ProfilePhoto.png";
+}
+<style>
+
+    @@media only screen and (max-width:400px) {
+        .container {
+            max-height: none;
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+
+        .dropzone {
+            max-height: 330px !important;
+        }
+
+        .Note {
+            margin-left: -30px !important;
+        }
+
+        #mdllistimagedialog {
+            max-height: 500px !important;
+        }
+    }
+
+    @@media (min-width:300px) and (max-width: 400px) {
+        .dropzone {
+            max-height: 400px;
+            overflow: auto;
+            height: 400px;
+        }
+    }
+
+    .dropzone {
+        max-height: 300px;
+        overflow: auto;
+        height: 300px;
+    }
+</style>
+
+<div>
+    <div class="col-sm-12">
+        <span>Note : You are allowed to upload only .jpg, .jpeg, and .png, type files here.</span>
+    </div>
+    <div style="width:800px;margin:0 auto;">
+        <div class="dropzone" id="my-awesome-dropzone"></div>
+        @*<form action="UploadImages"
+            class="dropzone"
+            id="my-awesome-dropzone" enctype="multipart/form-data"></form>*@
+        <div class="progress-bar" id="progress"></div>
+        <span id="currentFile"></span>
+        <input type="button" class="btn btn-primary" value="Upload" id="btnUploadImages" style="margin-top: 15px;float: right;margin-bottom:10px;padding:10px 20px;border-radius:3px;" />
+    </div>
+</div>
+<input id="hdnFolderPath" value="@Constant_UploadImagePath.UserUploadImage" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        debugger;
+        var MyDropZone;
+        Dropzone.options.acceptedFiles = ".png, .jpg, .jpeg";
+        Dropzone.options.dictMaxFilesExceeded = 'Maximum 20 Images Are Allowed To Upload At a Time.';
+        DropeZone(Dropzone.options.acceptedFiles, Dropzone.options.dictMaxFilesExceeded);
+        Dropzone.options.maxFilesize = 4;
+        $(".dropzone span").show();
+
+    });
+
+
+
+    function DropeZone(FileTypes, MaxFilesExceeded) {
+        debugger
+        MyDropZone = new Dropzone("#my-awesome-dropzone", {
+            url: '@Url.Action("UploadImage","NewsFeed",new { FolderPath = string.Empty})',
+            autoProcessQueue: false,
+            parallelUploads: 10,
+            addRemoveLinks: true,
+            acceptedFiles: FileTypes,
+            dictDuplicateFile: "Duplicate Files Cannot Be Uploaded",
+            preventDuplicates: true,
+            parallelUploads: 10000,
+            maxFilesize: 4, // Max 4 MB size
+            uploadMultiple: true,
+            maxFiles: 20,
+            dictMaxFilesExceeded: MaxFilesExceeded,
+
+            init: function () {
+                debugger
+                var myDrop = this;
+
+                $("#btnUploadImages").off('click').on('click', function (e) {
+                    debugger
+                    var data = MyDropZone
+                    var re = /(?:\.([^.]+))?$/;
+
+                    if (data.files.length > 0) {
+                        if (MyDropZone.getAcceptedFiles().length !== 0) {
+
+                        }
+
+                        if (MyDropZone.getUploadingFiles().length > 0) {
+                            //continue uploading process
+                            MyDropZone.processQueue();
+                        }
+                        else {
+                            var files = [];
+                            for (var i = 0; i < MyDropZone.getAcceptedFiles().length; i++) {
+                                files.push({ file: MyDropZone.getAcceptedFiles()[i], filename: MyDropZone.getAcceptedFiles()[i].upload.filename });
+                            }
+                            MyDropZone.removeAllFiles()
+                            for (var i = 0; i < files.length; i++) {
+                                MyDropZone.addFile(files[i].file);
+                                MyDropZone.getAcceptedFiles()[i].upload.filename = files[i].filename;
+                            }
+
+                            MyDropZone.processQueue();
+                        }
+                    }
+                });
+
+                this.on('addedfile', function (file) {
+                    $(".dz-details").css("height", "18%");
+                    debugger
+                    if (this.files.length) {
+                        var i, length;
+                        length = this.files.length;
+                        for (i = 0; i < length - 1; i++) {
+                            if (this.files[i].name === file.name && this.files[i].size === file.size) {
+                                this.removeFile(file);
+                                alert("Duplicate file is not allow");
+                                return false;
+                            }
+                        }
+                    }
+                });
+
+                this.on("error", function (file, message) {
+                    debugger
+                    alert(message);
+                    this.removeFile(file);
+                });
+
+                this.on("complete", function (file) {
+                    debugger
+                    if (this.getUploadingFiles().length === 0) {
+                        if (file.xhr != undefined) {
+                            var result = JSON.parse(file.xhr.response);
+                            if (result.IsSuccess) {
+                                $("#UploadDialog").dialog('close');
+                            }
+                            else {
+                                alert(result.Message);
+                                $("#UploadDialog").dialog('close');
+                            }
+                        }
+                        else {
+                            if (result.IsSuccess) {
+                                alert(result.Message);
+                            }
+                            else {
+                                alert(result.Message);
+                            }
+                        }
+                    }
+                    setTimeout(function () {
+                        GetUploadedImages();
+                    }, 10);
+                });
+            }
+        });
+    }
+
+    function GetUploadedImages() {
+        debugger
+        $.ajax({
+            url: '@Url.Action("GetUplodedImage", "NewsFeed")',
+            type: 'GET',
+            datatype: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                debugger
+                if (result != null) {
+                    result = JSON.parse(JSON.stringify(result));
+                    result.Data.forEach(function (data, index) {
+                        // each iteration
+                        var UserID = data.UserID;
+                        var ImagePath = data.ImagePath;
+                        var UserName = data.UserName;
+
+                        debugger;
+                        $("#lblname").text(UserName);
+                        $("#uploadedimage").attr('src', ImagePath);
+                        $("#mainDiv").prepend($("#NewUpload").html());
+                        //$("#imgUploadProfileImage").attr('src', '~/images/ProfilePhoto.png');
+                    });
+                }
+            },
+            error: function (err, xhr, thrownError) {
+            },
+            complete: function () {
+            }
+        });
+    }
+
+</script>

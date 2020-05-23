@@ -1,0 +1,42 @@
+﻿@*@model MvcLoginApp.Models.*@
+@model IEnumerable<MvcLoginApp.Models.RequestedListModel>
+@{
+    ViewBag.Title = "Contact Page";
+}
+<style>
+    .lbltitle {
+        background-color: gainsboro;
+        padding: 5px
+    }
+</style>
+<div>
+    <div style="text-align:left;padding:20px;">
+        <h4 class="lbltitle">Requested List</h4>
+    </div>
+   
+    <table class="table table-responsive table-striped">
+        <thead>
+            <tr>
+                <td>@Html.Hidden("UserID")</td>
+                <td>@Html.DisplayNameFor(x => x.EmailAddress) </td>
+                <td>@Html.DisplayNameFor(x => x.UserName)</td>
+                <td>@Html.DisplayNameFor(x => x.Type)</td>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.HiddenFor(x => item.UserID)</td>
+                    <td>@Html.DisplayFor(x => item.EmailAddress)</td>
+                    <td>@Html.DisplayFor(x => item.UserName)</td>
+                    <td>@Html.DisplayFor(x => item.Type)</td>
+                    <td>@Html.ActionLink("Cancel Request", "CancelSentRequest", new { id = item.UserID }, new { @class = "btn btn-primary" })</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

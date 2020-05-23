@@ -1,0 +1,40 @@
+﻿@*@model MvcLoginApp.Models.*@
+@model IEnumerable<MvcLoginApp.Models.RegistrationPageModel>
+@using MvcLoginApp.Common_Classes
+@{
+    ViewBag.Title = "FriendList Page";
+}
+
+<div class="container">
+    <div>
+        <h4 style="text-align:center;"><b>@ProjectSession.EmailAddress</b> your friend list is here.</h4>
+    </div>
+    @*<div style="text-align:center;padding:20px;">
+        <h4>Friend List</h4>
+    </div>*@
+    <table class="table table-responsive table-striped">
+        <thead>
+            <tr>
+                <td>@Html.Hidden("UserID")</td>
+                <td>@Html.DisplayNameFor(x => x.EmailAddress) </td>
+                <td>@Html.DisplayNameFor(x => x.UserName)</td>
+                <td>@Html.DisplayNameFor(x => x.Type)</td>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.HiddenFor(x => item.UserID)</td>
+                    <td>@Html.DisplayFor(x => item.EmailAddress)</td>
+                    <td>@Html.DisplayFor(x => item.UserName)</td>
+                    <td>@Html.DisplayFor(x => item.Type)</td>
+                    <td>@Html.ActionLink("Unfriend", "UnFriend", new { id = item.UserID }, new { @class = "btn btn-primary" })</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
